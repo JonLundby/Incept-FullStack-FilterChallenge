@@ -24,24 +24,24 @@ interface SelectOption {
 }
 
 export default function Home() {
-    // --- State to hold fetched data */
+    /** State to hold fetched data */
     const [modules, setModules] = useState<Module[]>([]);
     const [units, setUnits] = useState<Unit[]>([]);
     const [locations, setLocations] = useState<Location[]>([]);
 
-    // --- State to hold user selections ---
+    /** State to hold user selections */
     const [selectedModuleIds, setSelectedModuleIds] = useState<number[]>([]);
     const [selectedUnitIds, setSelectedUnitIds] = useState<number[]>([]);
     const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
 
-    // --- State to hold validation result ---
+    /** --- State to hold validation result */
     const [isValid, setIsValid] = useState<boolean>(false);
 
-    // --- State to handle loading and errors ---
+    /** --- State to handle loading and errors */
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Helper function to build query strings
+    /** Helper function to build query strings */
     const buildQuery = (params: { [key: string]: number[] }) => {
         const query = Object.entries(params)
             .filter(([values]) => values.length > 0)
@@ -50,7 +50,7 @@ export default function Home() {
         return query ? `?${query}` : "";
     };
 
-    // Fetch MODULES whenever selectedUnitIds or selectedLocationIds change
+    /** Fetch MODULES whenever selectedUnitIds or selectedLocationIds change */
     useEffect(() => {
         const fetchModules = async () => {
             setLoading(true);
@@ -74,7 +74,7 @@ export default function Home() {
         fetchModules();
     }, [selectedUnitIds, selectedLocationIds]);
 
-    // Fetch UNITS whenever selectedModuleIds or selectedLocationIds change
+    /** Fetch UNITS whenever selectedModuleIds or selectedLocationIds change */
     useEffect(() => {
         const fetchUnits = async () => {
             setLoading(true);
@@ -97,7 +97,7 @@ export default function Home() {
         fetchUnits();
     }, [selectedModuleIds, selectedLocationIds]);
 
-    // Fetch LOCATIONS whenever selectedModuleIds or selectedUnitIds change
+    /** Fetch LOCATIONS whenever selectedModuleIds or selectedUnitIds change */
     useEffect(() => {
         const fetchLocations = async () => {
             setLoading(true);
@@ -120,42 +120,44 @@ export default function Home() {
         fetchLocations();
     }, [selectedModuleIds, selectedUnitIds]);
 
-    // Convert modules into react-select options
+    /** Convert modules into react-select options */
     const moduleOptions: SelectOption[] = modules.map((m) => ({
         value: m.id,
         label: m.title,
     }));
-    // Convert units into react-select options
+
+    /** Convert units into react-select options */
     const unitOptions: SelectOption[] = units.map((u) => ({
         value: u.id,
         label: u.name,
     }));
-    // Convert locations into react-select options
+
+    /** Convert locations into react-select options */
     const locationOptions: SelectOption[] = locations.map((l) => ({
         value: l.id,
         label: l.name,
     }));
 
-    // Handlers for multi-select changes
+    /** Handlers for multi-select changes */
     const handleChangeSelectedModules = (options: MultiValue<SelectOption>) => {
         const ids = options.map((opt) => opt.value);
         setSelectedModuleIds(ids);
         setIsValid(false);
     };
-    
+
     const handleChangeSelectedUnits = (options: MultiValue<SelectOption>) => {
         const ids = options.map((opt) => opt.value);
         setSelectedUnitIds(ids);
         setIsValid(false);
     };
-    
+
     const handleChangeSelectedLocations = (options: MultiValue<SelectOption>) => {
         const ids = options.map((opt) => opt.value);
         setSelectedLocationIds(ids);
         setIsValid(false);
     };
 
-    // Apply filters
+    /** Apply filters */
     const handleApplyFilters = async () => {
         setLoading(true);
         setError(null);
@@ -175,7 +177,7 @@ export default function Home() {
 
             if (!res.ok) {
                 const errorData = await res.json();
-                setError(errorData.errors.join(", ")); // alternatively only show the first error: errorData.errors[0]
+                setError(errorData.errors.join(", \n")); // alternatively only show the first error: errorData.errors[0]. instead of  , a new line can be added with
                 setIsValid(false);
             } else {
                 setIsValid(true);
@@ -187,25 +189,26 @@ export default function Home() {
         }
     };
 
-    // Reset all filters
+    /** Reset all filters */
     const resetFilters = () => {
         setSelectedModuleIds([]);
         setSelectedUnitIds([]);
         setSelectedLocationIds([]);
         setIsValid(false);
+        setError(null);
 
         console.log(modules, units, locations);
     };
 
-    // --- Render UI ---
+    /** Render UI */
     return (
-        <div className="p-4">
+        <div className="p-4 m-4">
             <h3 className="text-2xl font-bold">Filters</h3>
 
             {/* Select Modules */}
             <h5 className="text-sm font-semibold">Select modules:</h5>
             <Select
-                className="text-black mb-2"
+                className="text-black mb-2 w-1/4"
                 placeholder={modules.length ? "Select modules" : "No modules available"}
                 isMulti
                 instanceId="modules-select"
@@ -217,7 +220,7 @@ export default function Home() {
             {/* Select Units */}
             <h5 className="text-sm font-semibold">Select units:</h5>
             <Select
-                className="text-black mb-2"
+                className="text-black mb-2 w-1/4"
                 placeholder={units.length ? "Select units" : "No units available"}
                 isMulti
                 instanceId="units-select"
@@ -229,7 +232,7 @@ export default function Home() {
             {/* Select Locations */}
             <h5 className="text-sm font-semibold">Select locations:</h5>
             <Select
-                className="text-black mb-2"
+                className="text-black mb-2 w-1/4"
                 placeholder={locations.length ? "Select locations" : "No modules locations"}
                 isMulti
                 instanceId="locations-select"
